@@ -1,13 +1,11 @@
-FROM golang:1.22.0
+FROM golang:1.22
 
-WORKDIR /42-docker-final-main
+WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY . .
 
-RUN go mod download
+RUN go mod tidy
 
-COPY *.go *db ./
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /main main.go
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /my_app
-
-CMD ["/my_app"]
+CMD ["/main"]
