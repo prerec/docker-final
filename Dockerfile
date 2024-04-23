@@ -1,11 +1,15 @@
-FROM golang:1.22
+FROM golang:1.22 AS builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN go mod tidy
+RUN go build -o myapp .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /main main.go
+FROM debian:buster-slim
 
-CMD ["/main"]
+COPY --from=builder /app/myapp /usr/local/bin/myapp
+
+WORKDIR /usr/local/bin/
+
+CMD ["./myapp"]
