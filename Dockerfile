@@ -1,13 +1,15 @@
-FROM golang:1.22.0
+FROM golang:1.22 AS builder
 
-WORKDIR /42-docker-final-main
+WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY . .
 
-RUN go mod download
+RUN go build -o myapp .
 
-COPY *.go *db ./
+FROM debian:buster-slim
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /my_app
+COPY --from=builder /app/myapp /usr/local/bin/myapp
 
-CMD ["/my_app"]
+WORKDIR /usr/local/bin/
+
+CMD ["./myapp"]
